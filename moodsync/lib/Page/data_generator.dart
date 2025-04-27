@@ -19,7 +19,7 @@ Stream<Map<String, double>> getSensorData() async* {
     );
 
     while (true) {
-      await Future.delayed(Duration(seconds: 1)); // Update interval to 1 second
+      await Future.delayed(Duration(minutes: 1)); // Update interval to 1 second
 
       // 获取当前噪声级别
       final noiseLevel = latestNoiseReading?.meanDecibel ?? 0.0;

@@ -31,6 +31,7 @@ class _HistoryPageState extends State<HistoryPage> {
   };
 
   DateTime _selectedDate = DateTime.now(); // Selected date state
+  DateTime _focusedDate = DateTime.now(); // Add a focused date state
   final bool _isOverallExpanded =
       true; // Default expanded state for Overall Stress Index
 
@@ -57,11 +58,12 @@ class _HistoryPageState extends State<HistoryPage> {
           TableCalendar(
             firstDay: DateTime(2023, 1, 1),
             lastDay: DateTime.now(),
-            focusedDay: _selectedDate,
+            focusedDay: _focusedDate, // Use _focusedDate here
             selectedDayPredicate: (day) => isSameDay(day, _selectedDate),
             onDaySelected: (selectedDay, focusedDay) {
               setState(() {
                 _selectedDate = selectedDay;
+                _focusedDate = focusedDay; // Update _focusedDate as well
               });
               // Load assessment for the selected day
               final assessment = _dailyAssessments[_selectedDate];
@@ -74,6 +76,12 @@ class _HistoryPageState extends State<HistoryPage> {
                 _selectedStress = null;
                 _descriptionController.clear();
               }
+            },
+            onPageChanged: (focusedDay) {
+              setState(() {
+                _focusedDate =
+                    focusedDay; // Update _focusedDate when the page changes
+              });
             },
             calendarFormat: CalendarFormat.week, // Show only the current week
             calendarStyle: CalendarStyle(

@@ -328,24 +328,24 @@ class _MainScreenState extends State<MainScreen> {
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
                             children: [
-                              if (visibility['Motion Activity']!)
-                                IndexCard(
-                                  label: 'Motion Activity',
-                                  value: preferences['Motion Activity']!,
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder:
-                                            (context) => IndexDetailPage(
-                                              label: 'Motion Activity',
-                                              value:
-                                                  preferences['Motion Activity']!,
-                                            ),
-                                      ),
-                                    );
-                                  },
-                                ),
+                              // if (visibility['Motion Activity']!)
+                              //   IndexCard(
+                              //     label: 'Motion Activity',
+                              //     value: preferences['Motion Activity']!,
+                              //     onTap: () {
+                              //       Navigator.push(
+                              //         context,
+                              //         MaterialPageRoute(
+                              //           builder:
+                              //               (context) => IndexDetailPage(
+                              //                 label: 'Motion Activity',
+                              //                 value:
+                              //                     preferences['Motion Activity']!,
+                              //               ),
+                              //         ),
+                              //       );
+                              //     },
+                              //   ),
                               if (visibility['Sleep Quality']!)
                                 IndexCard(
                                   label: 'Sleep Quality',
