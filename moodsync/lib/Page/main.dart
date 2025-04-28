@@ -1,11 +1,29 @@
+import 'dart:io'; // Add this import for platform checks
+import 'package:permission_handler/permission_handler.dart'; // Add this package for permissions
 import 'package:flutter/material.dart';
 import 'indexpreference.dart';
 import 'indexpage.dart';
 import 'History.dart';
 import 'Me.dart';
 import 'data_generator.dart'; // Re-enable the utility file import
+import 'splash_screen.dart'; // Re-enable the splash screen import
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // Ensure Flutter bindings are initialized
+
+  if (Platform.isIOS) {
+    // Request microphone permission on iOS
+    final status = await Permission.microphone.request();
+    if (status.isGranted) {
+      print("麦克风权限已授予");
+    } else if (status.isDenied) {
+      print("麦克风权限被拒绝，请再次尝试请求权限。");
+    } else if (status.isPermanentlyDenied) {
+      print("麦克风权限被永久拒绝，请在设置中启用权限。");
+      openAppSettings(); // Redirect user to app settings
+    }
+  }
+
   runApp(const MoodSyncApp());
 }
 
@@ -16,7 +34,7 @@ class MoodSyncApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: MainScreen(),
+      home: const SplashScreen(),
     );
   }
 }
@@ -31,7 +49,16 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0; // Track the selected tab
   double stressIndex = 0.5; // Example stress index
-  Map<String, double> preferences = {};
+  Map<String, double> preferences = {
+    'Noise Level': 0.0,
+    'Air Quality': 0.0,
+    'Temperature': 0.0,
+    'Humidity': 0.0,
+    'Light Exposure': 0.0,
+    'Locational Density': 0.0,
+    'Sleep Quality': 0.0,
+    'Physical Activity': 0.0,
+  };
   Map<String, bool> visibility = {
     'Noise Level': true,
     'Air Quality': true,
@@ -47,8 +74,6 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
-    //preferences = generateRandomPreferences(); // Initialize with random data
-
     // Subscribe to sensor data
     getSensorData().listen((sensorData) {
       setState(() {
@@ -204,7 +229,9 @@ class _MainScreenState extends State<MainScreen> {
                               if (visibility['Noise Level']!)
                                 IndexCard(
                                   label: 'Noise Level',
-                                  value: preferences['Noise Level']!,
+                                  value:
+                                      preferences['Noise Level'] ??
+                                      0.0, // Ensure null safety
                                   onTap: () {
                                     Navigator.push(
                                       context,
@@ -213,7 +240,8 @@ class _MainScreenState extends State<MainScreen> {
                                             (context) => IndexDetailPage(
                                               label: 'Noise Level',
                                               value:
-                                                  preferences['Noise Level']!,
+                                                  preferences['Noise Level'] ??
+                                                  0.0, // Ensure null safety
                                             ),
                                       ),
                                     );
@@ -222,7 +250,9 @@ class _MainScreenState extends State<MainScreen> {
                               if (visibility['Air Quality']!)
                                 IndexCard(
                                   label: 'Air Quality',
-                                  value: preferences['Air Quality']!,
+                                  value:
+                                      preferences['Air Quality'] ??
+                                      0.0, // Ensure null safety
                                   onTap: () {
                                     Navigator.push(
                                       context,
@@ -231,7 +261,8 @@ class _MainScreenState extends State<MainScreen> {
                                             (context) => IndexDetailPage(
                                               label: 'Air Quality',
                                               value:
-                                                  preferences['Air Quality']!,
+                                                  preferences['Air Quality'] ??
+                                                  0.0, // Ensure null safety
                                             ),
                                       ),
                                     );
@@ -240,7 +271,9 @@ class _MainScreenState extends State<MainScreen> {
                               if (visibility['Temperature']!)
                                 IndexCard(
                                   label: 'Temperature',
-                                  value: preferences['Temperature']!,
+                                  value:
+                                      preferences['Temperature'] ??
+                                      0.0, // Ensure null safety
                                   onTap: () {
                                     Navigator.push(
                                       context,
@@ -249,7 +282,8 @@ class _MainScreenState extends State<MainScreen> {
                                             (context) => IndexDetailPage(
                                               label: 'Temperature',
                                               value:
-                                                  preferences['Temperature']!,
+                                                  preferences['Temperature'] ??
+                                                  0.0, // Ensure null safety
                                             ),
                                       ),
                                     );
@@ -258,7 +292,9 @@ class _MainScreenState extends State<MainScreen> {
                               if (visibility['Humidity']!)
                                 IndexCard(
                                   label: 'Humidity',
-                                  value: preferences['Humidity']!,
+                                  value:
+                                      preferences['Humidity'] ??
+                                      0.0, // Ensure null safety
                                   onTap: () {
                                     Navigator.push(
                                       context,
@@ -266,7 +302,9 @@ class _MainScreenState extends State<MainScreen> {
                                         builder:
                                             (context) => IndexDetailPage(
                                               label: 'Humidity',
-                                              value: preferences['Humidity']!,
+                                              value:
+                                                  preferences['Humidity'] ??
+                                                  0.0, // Ensure null safety
                                             ),
                                       ),
                                     );
@@ -275,7 +313,9 @@ class _MainScreenState extends State<MainScreen> {
                               if (visibility['Light Exposure']!)
                                 IndexCard(
                                   label: 'Light Exposure',
-                                  value: preferences['Light Exposure']!,
+                                  value:
+                                      preferences['Light Exposure'] ??
+                                      0.0, // Ensure null safety
                                   onTap: () {
                                     Navigator.push(
                                       context,
@@ -284,7 +324,8 @@ class _MainScreenState extends State<MainScreen> {
                                             (context) => IndexDetailPage(
                                               label: 'Light Exposure',
                                               value:
-                                                  preferences['Light Exposure']!,
+                                                  preferences['Light Exposure'] ??
+                                                  0.0, // Ensure null safety
                                             ),
                                       ),
                                     );
@@ -293,7 +334,9 @@ class _MainScreenState extends State<MainScreen> {
                               if (visibility['Locational Density']!)
                                 IndexCard(
                                   label: 'Locational Density',
-                                  value: preferences['Locational Density']!,
+                                  value:
+                                      preferences['Locational Density'] ??
+                                      0.0, // Ensure null safety
                                   onTap: () {
                                     Navigator.push(
                                       context,
@@ -302,7 +345,8 @@ class _MainScreenState extends State<MainScreen> {
                                             (context) => IndexDetailPage(
                                               label: 'Locational Density',
                                               value:
-                                                  preferences['Locational Density']!,
+                                                  preferences['Locational Density'] ??
+                                                  0.0, // Ensure null safety
                                             ),
                                       ),
                                     );
@@ -349,7 +393,9 @@ class _MainScreenState extends State<MainScreen> {
                               if (visibility['Sleep Quality']!)
                                 IndexCard(
                                   label: 'Sleep Quality',
-                                  value: preferences['Sleep Quality']!,
+                                  value:
+                                      preferences['Sleep Quality'] ??
+                                      0.0, // Ensure null safety
                                   onTap: () {
                                     Navigator.push(
                                       context,
@@ -358,7 +404,8 @@ class _MainScreenState extends State<MainScreen> {
                                             (context) => IndexDetailPage(
                                               label: 'Sleep Quality',
                                               value:
-                                                  preferences['Sleep Quality']!,
+                                                  preferences['Sleep Quality'] ??
+                                                  0.0, // Ensure null safety
                                             ),
                                       ),
                                     );
@@ -367,7 +414,9 @@ class _MainScreenState extends State<MainScreen> {
                               if (visibility['Physical Activity']!)
                                 IndexCard(
                                   label: 'Physical Activity',
-                                  value: preferences['Physical Activity']!,
+                                  value:
+                                      preferences['Physical Activity'] ??
+                                      0.0, // Ensure null safety
                                   onTap: () {
                                     Navigator.push(
                                       context,
@@ -376,7 +425,8 @@ class _MainScreenState extends State<MainScreen> {
                                             (context) => IndexDetailPage(
                                               label: 'Physical Activity',
                                               value:
-                                                  preferences['Physical Activity']!,
+                                                  preferences['Physical Activity'] ??
+                                                  0.0, // Ensure null safety
                                             ),
                                       ),
                                     );
