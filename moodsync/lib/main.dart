@@ -40,8 +40,6 @@ class _MainScreenState extends State<MainScreen> {
     'Temperature': 0.0,
     'Humidity': 0.0,
     'Light Exposure': 0.0,
-    'Locational Density': 0.0,
-    'Sleep Quality': 0.0,
     'Physical Activity': 0.0,
   };
   Map<String, bool> visibility = {
@@ -50,9 +48,7 @@ class _MainScreenState extends State<MainScreen> {
     'Temperature': true,
     'Humidity': true,
     'Light Exposure': true,
-    'Locational Density': true,
     'Motion Activity': true,
-    'Sleep Quality': true,
     'Physical Activity': true,
   };
 
@@ -174,22 +170,6 @@ class _MainScreenState extends State<MainScreen> {
                       ),
                     ),
                     SizedBox(height: 20),
-                    // Add statement for abnormal values with improved styling
-                    Container(
-                      margin: EdgeInsets.symmetric(horizontal: 16),
-                      padding: EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.red[50],
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.red, width: 1),
-                      ),
-                      child: Text(
-                        _getAbnormalityStatement(),
-                        style: TextStyle(fontSize: 16, color: Colors.red),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    SizedBox(height: 20),
                     // Directly display the list
                     Expanded(
                       child: ListView(
@@ -204,138 +184,83 @@ class _MainScreenState extends State<MainScreen> {
                             ),
                           ),
                           SizedBox(height: 8),
-                          GridView.count(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 16,
-                            mainAxisSpacing: 16,
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               if (visibility['Noise Level']!)
-                                IndexCard(
-                                  label: 'Noise Level',
-                                  value:
-                                      preferences['Noise Level'] ??
-                                      0.0, // Ensure null safety
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder:
-                                            (context) => IndexDetailPage(
-                                              label: 'Noise Level',
-                                              value:
-                                                  preferences['Noise Level'] ??
-                                                  0.0, // Ensure null safety
-                                            ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              if (visibility['Air Quality']!)
-                                IndexCard(
-                                  label: 'Air Quality',
-                                  value:
-                                      preferences['Air Quality'] ??
-                                      0.0, // Ensure null safety
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder:
-                                            (context) => IndexDetailPage(
-                                              label: 'Air Quality',
-                                              value:
-                                                  preferences['Air Quality'] ??
-                                                  0.0, // Ensure null safety
-                                            ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              if (visibility['Temperature']!)
-                                IndexCard(
-                                  label: 'Temperature',
-                                  value:
-                                      preferences['Temperature'] ??
-                                      0.0, // Ensure null safety
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder:
-                                            (context) => IndexDetailPage(
-                                              label: 'Temperature',
-                                              value:
-                                                  preferences['Temperature'] ??
-                                                  0.0, // Ensure null safety
-                                            ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              if (visibility['Humidity']!)
-                                IndexCard(
-                                  label: 'Humidity',
-                                  value:
-                                      preferences['Humidity'] ??
-                                      0.0, // Ensure null safety
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder:
-                                            (context) => IndexDetailPage(
-                                              label: 'Humidity',
-                                              value:
-                                                  preferences['Humidity'] ??
-                                                  0.0, // Ensure null safety
-                                            ),
-                                      ),
-                                    );
-                                  },
+                                SizedBox(
+                                  width: 120,
+                                  height: 150,
+                                  child: IndexCard(
+                                    label: 'Noise Level',
+                                    value:
+                                        preferences['Noise Level'] ??
+                                        0.0, // Ensure null safety
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) => IndexDetailPage(
+                                                label: 'Noise Level',
+                                                value:
+                                                    preferences['Noise Level'] ??
+                                                    0.0, // Ensure null safety
+                                              ),
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ),
                               if (visibility['Light Exposure']!)
-                                IndexCard(
-                                  label: 'Light Exposure',
-                                  value:
-                                      preferences['Light Exposure'] ??
-                                      0.0, // Ensure null safety
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder:
-                                            (context) => IndexDetailPage(
-                                              label: 'Light Exposure',
-                                              value:
-                                                  preferences['Light Exposure'] ??
-                                                  0.0, // Ensure null safety
-                                            ),
-                                      ),
-                                    );
-                                  },
+                                SizedBox(
+                                  width: 120,
+                                  height: 150,
+                                  child: IndexCard(
+                                    label: 'Light Exposure',
+                                    value:
+                                        preferences['Light Exposure'] ??
+                                        0.0, // Ensure null safety
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) => IndexDetailPage(
+                                                label: 'Light Exposure',
+                                                value:
+                                                    preferences['Light Exposure'] ??
+                                                    0.0, // Ensure null safety
+                                              ),
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ),
-                              if (visibility['Locational Density']!)
-                                IndexCard(
-                                  label: 'Locational Density',
-                                  value:
-                                      preferences['Locational Density'] ??
-                                      0.0, // Ensure null safety
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder:
-                                            (context) => IndexDetailPage(
-                                              label: 'Locational Density',
-                                              value:
-                                                  preferences['Locational Density'] ??
-                                                  0.0, // Ensure null safety
-                                            ),
-                                      ),
-                                    );
-                                  },
+                              if (visibility['Physical Activity']!)
+                                SizedBox(
+                                  width: 120,
+                                  height: 150,
+                                  child: IndexCard(
+                                    label: 'Motion Level',
+                                    value:
+                                        preferences['Physical Activity'] ??
+                                        0.0, // Ensure null safety
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) => IndexDetailPage(
+                                                label: 'Physical Activity',
+                                                value:
+                                                    preferences['Physical Activity'] ??
+                                                    0.0, // Ensure null safety
+                                              ),
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ),
                             ],
                           ),
@@ -343,79 +268,90 @@ class _MainScreenState extends State<MainScreen> {
                           // Personal Section
                           SizedBox(height: 16),
                           Text(
-                            'Personal',
+                            'Other Indices',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           SizedBox(height: 8),
-                          GridView.count(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 16,
-                            mainAxisSpacing: 16,
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              // if (visibility['Motion Activity']!)
-                              //   IndexCard(
-                              //     label: 'Motion Activity',
-                              //     value: preferences['Motion Activity']!,
-                              //     onTap: () {
-                              //       Navigator.push(
-                              //         context,
-                              //         MaterialPageRoute(
-                              //           builder:
-                              //               (context) => IndexDetailPage(
-                              //                 label: 'Motion Activity',
-                              //                 value:
-                              //                     preferences['Motion Activity']!,
-                              //               ),
-                              //         ),
-                              //       );
-                              //     },
-                              //   ),
-                              if (visibility['Sleep Quality']!)
-                                IndexCard(
-                                  label: 'Sleep Quality',
-                                  value:
-                                      preferences['Sleep Quality'] ??
-                                      0.0, // Ensure null safety
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder:
-                                            (context) => IndexDetailPage(
-                                              label: 'Sleep Quality',
-                                              value:
-                                                  preferences['Sleep Quality'] ??
-                                                  0.0, // Ensure null safety
-                                            ),
-                                      ),
-                                    );
-                                  },
+                              if (visibility['Air Quality']!)
+                                SizedBox(
+                                  width: 120,
+                                  height: 150,
+                                  child: IndexCard(
+                                    label: 'Air Quality',
+                                    value:
+                                        preferences['Air Quality'] ??
+                                        0.0, // Ensure null safety
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) => IndexDetailPage(
+                                                label: 'Air Quality',
+                                                value:
+                                                    preferences['Air Quality'] ??
+                                                    0.0, // Ensure null safety
+                                              ),
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ),
-                              if (visibility['Physical Activity']!)
-                                IndexCard(
-                                  label: 'Physical Activity',
-                                  value:
-                                      preferences['Physical Activity'] ??
-                                      0.0, // Ensure null safety
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder:
-                                            (context) => IndexDetailPage(
-                                              label: 'Physical Activity',
-                                              value:
-                                                  preferences['Physical Activity'] ??
-                                                  0.0, // Ensure null safety
-                                            ),
-                                      ),
-                                    );
-                                  },
+                              if (visibility['Temperature']!)
+                                SizedBox(
+                                  width: 120,
+                                  height: 150,
+                                  child: IndexCard(
+                                    label: 'Temperature',
+                                    value:
+                                        preferences['Temperature'] ??
+                                        0.0, // Ensure null safety
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) => IndexDetailPage(
+                                                label: 'Temperature',
+                                                value:
+                                                    preferences['Temperature'] ??
+                                                    0.0, // Ensure null safety
+                                              ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              if (visibility['Humidity']!)
+                                SizedBox(
+                                  width: 120,
+                                  height: 150,
+                                  child: IndexCard(
+                                    label: 'Humidity',
+                                    value:
+                                        preferences['Humidity'] ??
+                                        0.0, // Ensure null safety
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) => IndexDetailPage(
+                                                label: 'Humidity',
+                                                value:
+                                                    preferences['Humidity'] ??
+                                                    0.0, // Ensure null safety
+                                              ),
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ),
                             ],
                           ),
@@ -453,18 +389,6 @@ class _MainScreenState extends State<MainScreen> {
       ),
     );
   }
-
-  String _getAbnormalityStatement() {
-    final buffer = StringBuffer();
-    preferences.forEach((key, value) {
-      if (value > 0.7) {
-        buffer.writeln('$key is high. Consider reducing exposure.');
-      }
-    });
-    return buffer.isEmpty
-        ? 'All indicators are within normal ranges.'
-        : buffer.toString().trim();
-  }
 }
 
 class IndexCard extends StatelessWidget {
@@ -488,36 +412,43 @@ class IndexCard extends StatelessWidget {
         margin: EdgeInsets.symmetric(vertical: 8),
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment:
+              MainAxisAlignment.start, // Align content to the top
           children: [
-            ListTile(
-              title: Text(label),
-              subtitle: LinearProgressIndicator(
-                value: value,
-                color:
-                    value > 0.7
-                        ? Colors.red
-                        : value > 0.4
-                        ? Colors.orange
-                        : Colors.green,
-              ),
-              trailing: Text('${(value * 100).toStringAsFixed(0)}%'),
-            ),
+            // Title at the very top
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Low',
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                  Text(
-                    'High',
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                ],
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Text(
+                label,
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),
             ),
+            Spacer(), // Push content to the bottom
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Color dot to the left of the percentage
+                Container(
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color:
+                        value > 0.7
+                            ? Colors.red
+                            : value > 0.4
+                            ? Colors.orange
+                            : Colors.green,
+                  ),
+                ),
+                SizedBox(width: 6),
+                Text(
+                  '${(value * 100).toStringAsFixed(0)}%',
+                  style: TextStyle(fontSize: 14),
+                ),
+              ],
+            ),
+            SizedBox(height: 8), // Add spacing at the bottom
           ],
         ),
       ),

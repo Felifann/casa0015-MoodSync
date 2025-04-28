@@ -1,5 +1,7 @@
 PODS:
   - Flutter (1.0.0)
+  - flutter_sensors (0.0.1):
+    - Flutter
   - permission_handler_apple (9.1.1):
     - Flutter
   - screen_brightness (0.0.1):
@@ -7,12 +9,15 @@ PODS:
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
+  - flutter_sensors (from `.symlinks/plugins/flutter_sensors/ios`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - screen_brightness (from `.symlinks/plugins/screen_brightness/ios`)
 
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
+  flutter_sensors:
+    :path: ".symlinks/plugins/flutter_sensors/ios"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
   screen_brightness:
@@ -20,6 +25,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  flutter_sensors: 7e455ebbfb9a67439304ccc474e98f209aceb821
   permission_handler_apple: 3787117e48f80715ff04a3830ca039283d6a4f29
   screen_brightness: ca08f82cb060d806f169050e6abf99fb2fd1fa1b
 
