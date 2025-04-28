@@ -45,22 +45,20 @@ class _MainScreenState extends State<MainScreen> {
     'Physical Activity': 0.0,
   };
   Map<String, bool> visibility = {
-    'Noise Level': true,
-    'Air Quality': true,
-    'Temperature': true,
-    'Humidity': true,
-    'Light Exposure': true,
-    'Motion Activity': true,
-    'Physical Activity': true,
+    'noise': true,
+    'light': true,
+    'motion': true,
+    'airquality': true,
+    'weather': true,
   };
 
   @override
   void initState() {
     super.initState();
     // Subscribe to sensor data
-    getSensorData().listen((sensorData) {
+    getSensorData().listen((mainpageData) {
       setState(() {
-        preferences.addAll(sensorData);
+        preferences.addAll(mainpageData);
       });
     });
   }
@@ -189,75 +187,46 @@ class _MainScreenState extends State<MainScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              if (visibility['Noise Level']!)
+                              if (visibility['noise']!)
                                 SizedBox(
                                   width: 120,
                                   height: 150,
                                   child: IndexCard(
-                                    label: 'Noise Level',
-                                    value:
-                                        preferences['Noise Level'] ??
-                                        0.0, // Ensure null safety
+                                    label: 'Noise',
+                                    value: preferences['Noise Level'] ?? 0.0,
                                     onTap: () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                           builder:
                                               (context) => IndexDetailPage(
-                                                label: 'Noise Level',
+                                                label: 'Noise',
                                                 value:
                                                     preferences['Noise Level'] ??
-                                                    0.0, // Ensure null safety
+                                                    0.0,
                                               ),
                                         ),
                                       );
                                     },
                                   ),
                                 ),
-                              if (visibility['Light Exposure']!)
+                              if (visibility['light']!)
                                 SizedBox(
                                   width: 120,
                                   height: 150,
                                   child: IndexCard(
-                                    label: 'Light Exposure',
-                                    value:
-                                        preferences['Light Exposure'] ??
-                                        0.0, // Ensure null safety
+                                    label: 'Light',
+                                    value: preferences['Light Exposure'] ?? 0.0,
                                     onTap: () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                           builder:
                                               (context) => IndexDetailPage(
-                                                label: 'Light Exposure',
+                                                label: 'Light',
                                                 value:
                                                     preferences['Light Exposure'] ??
-                                                    0.0, // Ensure null safety
-                                              ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              if (visibility['Physical Activity']!)
-                                SizedBox(
-                                  width: 120,
-                                  height: 150,
-                                  child: IndexCard(
-                                    label: 'Motion Level',
-                                    value:
-                                        preferences['Physical Activity'] ??
-                                        0.0, // Ensure null safety
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder:
-                                              (context) => IndexDetailPage(
-                                                label: 'Physical Activity',
-                                                value:
-                                                    preferences['Physical Activity'] ??
-                                                    0.0, // Ensure null safety
+                                                    0.0,
                                               ),
                                         ),
                                       );
@@ -266,29 +235,41 @@ class _MainScreenState extends State<MainScreen> {
                                 ),
                             ],
                           ),
-
-                          // Personal Section
                           SizedBox(height: 16),
-                          Text(
-                            'Other Indices',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 8),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              if (visibility['Air Quality']!)
+                              if (visibility['motion']!)
+                                SizedBox(
+                                  width: 120,
+                                  height: 150,
+                                  child: IndexCard(
+                                    label: 'Motion',
+                                    value:
+                                        preferences['Physical Activity'] ?? 0.0,
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) => IndexDetailPage(
+                                                label: 'Motion',
+                                                value:
+                                                    preferences['Physical Activity'] ??
+                                                    0.0,
+                                              ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              if (visibility['airquality']!)
                                 SizedBox(
                                   width: 120,
                                   height: 150,
                                   child: IndexCard(
                                     label: 'Air Quality',
-                                    value:
-                                        preferences['Air Quality'] ??
-                                        0.0, // Ensure null safety
+                                    value: preferences['Air Quality'] ?? 0.0,
                                     onTap: () {
                                       Navigator.push(
                                         context,
@@ -298,57 +279,36 @@ class _MainScreenState extends State<MainScreen> {
                                                 label: 'Air Quality',
                                                 value:
                                                     preferences['Air Quality'] ??
-                                                    0.0, // Ensure null safety
+                                                    0.0,
                                               ),
                                         ),
                                       );
                                     },
                                   ),
                                 ),
-                              if (visibility['Temperature']!)
+                              if (visibility['weather']!)
                                 SizedBox(
                                   width: 120,
                                   height: 150,
                                   child: IndexCard(
-                                    label: 'Temperature',
+                                    label: 'Weather',
                                     value:
-                                        preferences['Temperature'] ??
-                                        0.0, // Ensure null safety
+                                        ((preferences['Temperature'] ?? 0.0) +
+                                            (preferences['Humidity'] ?? 0.0)) /
+                                        2,
                                     onTap: () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                           builder:
                                               (context) => IndexDetailPage(
-                                                label: 'Temperature',
+                                                label: 'Weather',
                                                 value:
-                                                    preferences['Temperature'] ??
-                                                    0.0, // Ensure null safety
-                                              ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              if (visibility['Humidity']!)
-                                SizedBox(
-                                  width: 120,
-                                  height: 150,
-                                  child: IndexCard(
-                                    label: 'Humidity',
-                                    value:
-                                        preferences['Humidity'] ??
-                                        0.0, // Ensure null safety
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder:
-                                              (context) => IndexDetailPage(
-                                                label: 'Humidity',
-                                                value:
-                                                    preferences['Humidity'] ??
-                                                    0.0, // Ensure null safety
+                                                    ((preferences['Temperature'] ??
+                                                            0.0) +
+                                                        (preferences['Humidity'] ??
+                                                            0.0)) /
+                                                    2,
                                               ),
                                         ),
                                       );

@@ -21,6 +21,14 @@ class _IndexPreferencePageState extends State<IndexPreferencePage> {
   void initState() {
     super.initState();
     _visibilityPrefs = Map<String, bool>.from(widget.visibilityPrefs);
+    // Ensure only the 5 specific indices are included
+    _visibilityPrefs = {
+      'noise': _visibilityPrefs['noise'] ?? true,
+      'light': _visibilityPrefs['light'] ?? true,
+      'motion': _visibilityPrefs['motion'] ?? true,
+      'airquality': _visibilityPrefs['airquality'] ?? true,
+      'weather': _visibilityPrefs['weather'] ?? true,
+    };
   }
 
   void _updateVisibility(String label, bool isVisible) {

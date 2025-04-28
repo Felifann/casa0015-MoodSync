@@ -72,7 +72,17 @@ class IndexDetailPage extends StatelessWidget {
               margin: EdgeInsets.only(top: 16),
               height: 200,
               color: Colors.grey.shade200,
-              child: Center(child: Text('Data Source Placeholder')),
+              child: Center(
+                child: Text(
+                  label == 'Air Quality'
+                      ? 'aq'
+                      : label == 'Temperature'
+                      ? 'tp'
+                      : label == 'Humidity'
+                      ? 'hd'
+                      : 'Data Source Placeholder',
+                ),
+              ),
             ),
             if (_isEnvironmentIndex(label)) ...[
               SizedBox(height: 32),

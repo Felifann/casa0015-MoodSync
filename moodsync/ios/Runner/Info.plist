@@ -20,6 +20,10 @@
 	<string>App需要您的同意,才能访问麦克风</string>
 	<key>NSCameraUsageDescription</key>
 	<string>We need access to your camera to measure ambient light levels.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>App需要您的同意,才能访问您的位置信息</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>App需要您的同意,才能始终访问您的位置信息</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
