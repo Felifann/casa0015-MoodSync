@@ -31,11 +31,9 @@ dependencies:
     sdk: flutter
   fl_chart: ^0.63.0
   table_calendar: ^3.0.8
-  flutter_sound: ^9.2.13
-  activity_recognition_flutter: ^5.0.0
-  geolocator: ^11.0.0
-  permission_handler: ^10.4.0 # 添加权限处理库
-  noise_meter: ^3.0.1
+  permission_handler: ^10.4.5 # 添加权限处理库
+  screen_brightness: ^0.0.4
+  
 
 
   # The following adds the Cupertino Icons font to your application.

@@ -1,5 +1,3 @@
-import 'dart:io'; // Add this import for platform checks
-import 'package:permission_handler/permission_handler.dart'; // Add this package for permissions
 import 'package:flutter/material.dart';
 import 'indexpreference.dart';
 import 'indexpage.dart';
@@ -10,19 +8,6 @@ import 'splash_screen.dart'; // Re-enable the splash screen import
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Ensure Flutter bindings are initialized
-
-  if (Platform.isIOS) {
-    // Request microphone permission on iOS
-    final status = await Permission.microphone.request();
-    if (status.isGranted) {
-      print("麦克风权限已授予");
-    } else if (status.isDenied) {
-      print("麦克风权限被拒绝，请再次尝试请求权限。");
-    } else if (status.isPermanentlyDenied) {
-      print("麦克风权限被永久拒绝，请在设置中启用权限。");
-      openAppSettings(); // Redirect user to app settings
-    }
-  }
 
   runApp(const MoodSyncApp());
 }
