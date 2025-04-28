@@ -4,6 +4,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/services.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:flutter_sensors/flutter_sensors.dart'; // Updated import for flutter_sensors
+import 'package:firebase_core/firebase_core.dart'; // Import Firebase core
+import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
 
 const MethodChannel _microphoneChannel = MethodChannel('microphone_data');
 
@@ -65,7 +67,12 @@ Future<double> _fetchPhysicalActivity() async {
   return 0.0; // Default value if an error occurs
 }
 
+Future<void> initializeFirebase() async {
+  await Firebase.initializeApp(); // Initialize Firebase
+}
+
 Stream<Map<String, double>> getSensorData() async* {
+  await initializeFirebase(); // Ensure Firebase is initialized
   await requestMicrophonePermission(); // Request microphone permission
 
   bool isRunning = true;
@@ -83,11 +90,7 @@ Stream<Map<String, double>> getSensorData() async* {
     final lightExposure = await _fetchLightExposure();
     final physicalActivity = await _fetchPhysicalActivity();
 
-    print(
-      'Noise Level: $noiseLevel, Light Exposure: $lightExposure, Physical Activity: $physicalActivity',
-    );
-
-    yield {
+    final sensorData = {
       'Noise Level': noiseLevel,
       'Air Quality': Random().nextDouble(),
       'Temperature': Random().nextDouble(),
@@ -95,6 +98,25 @@ Stream<Map<String, double>> getSensorData() async* {
       'Light Exposure': lightExposure,
       'Physical Activity': physicalActivity,
     };
+
+    print(
+      'Noise Level: $noiseLevel, Light Exposure: $lightExposure, Physical Activity: $physicalActivity',
+    );
+
+    // Upload data to Firebase
+    try {
+      await FirebaseFirestore.instance.collection('sensor_data').add({
+        'timestamp': FieldValue.serverTimestamp(),
+        ...sensorData,
+      });
+      print(
+        'Data uploaded successfully to Firebase: $sensorData',
+      ); // Success message
+    } catch (err) {
+      print('Error uploading data to Firebase: $err');
+    }
+
+    yield sensorData;
   }
 
   await controller.close();

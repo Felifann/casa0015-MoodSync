@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart'; // Import Firebase core
 import 'package:flutter/material.dart';
 import 'indexpreference.dart';
 import 'indexpage.dart';
@@ -8,6 +9,7 @@ import 'splash_screen.dart'; // Re-enable the splash screen import
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Ensure Flutter bindings are initialized
+  await Firebase.initializeApp(); // Initialize Firebase
 
   runApp(const MoodSyncApp());
 }
