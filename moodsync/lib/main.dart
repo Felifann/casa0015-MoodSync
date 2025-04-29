@@ -35,12 +35,11 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0; // Track the selected tab
-  double stressIndex = 0.5; // Example stress index
+  double stressIndex = 0.5; // Initialize stress index
   Map<String, double> preferences = {
     'Noise Level': 0.0,
     'Air Quality': 0.0,
-    'Temperature': 0.0,
-    'Humidity': 0.0,
+    'Weather': 0.0,
     'Light Exposure': 0.0,
     'Physical Activity': 0.0,
   };
@@ -59,6 +58,13 @@ class _MainScreenState extends State<MainScreen> {
     getSensorData().listen((mainpageData) {
       setState(() {
         preferences.addAll(mainpageData);
+        stressIndex = calculateStressIndex(
+          noiseLevel: mainpageData['Noise Level'] ?? 0.0,
+          lightExposure: mainpageData['Light Exposure'] ?? 0.0,
+          physicalActivity: mainpageData['Physical Activity'] ?? 0.0,
+          airQuality: mainpageData['Air Quality'] ?? 0.0,
+          weatherLevel: mainpageData['Weather'] ?? 0.0,
+        ); // Update stress index
       });
     });
   }
@@ -217,11 +223,7 @@ class _MainScreenState extends State<MainScreen> {
                                     height: 150,
                                     child: IndexCard(
                                       label: 'Weather',
-                                      value:
-                                          ((preferences['Temperature'] ?? 0.0) +
-                                              (preferences['Humidity'] ??
-                                                  0.0)) /
-                                          2,
+                                      value: preferences['Weather'] ?? 0.0,
                                       onTap: () {
                                         Navigator.push(
                                           context,

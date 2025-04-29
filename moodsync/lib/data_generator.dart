@@ -204,15 +204,6 @@ Stream<Map<String, double>> getSensorData() async* {
 
     final sensorData = {
       'Noise Level': noiseLevel,
-      'Air Quality': openWeatherData2['Air Quality']!,
-      'PM2.5': openWeatherData2['PM2.5']!, // New pollutant
-      'PM10': openWeatherData2['PM10']!, // New pollutant
-      'CO': openWeatherData2['CO']!, // New pollutant
-      'Temperature': openWeatherData1['Temperature']!,
-      'Humidity': openWeatherData1['Humidity']!,
-      'Rain': openWeatherData1['Rain']!,
-      'Cloudiness': openWeatherData1['Cloudiness']!,
-      'Wind Speed': openWeatherData1['Wind Speed']!,
       'Light Exposure': lightExposure,
       'Physical Activity': physicalActivity,
     };
@@ -227,29 +218,114 @@ Stream<Map<String, double>> getSensorData() async* {
       'Cloudiness': openWeatherData1['Cloudiness']!,
       'Wind Speed': openWeatherData1['Wind Speed']!,
     };
+
+    double weatherLevel = calculateWeatherBadness(
+      temperature: openWeatherData1['Temperature']!,
+      humidity: openWeatherData1['Humidity']!,
+      rain: openWeatherData1['Rain']!,
+      cloudiness: openWeatherData1['Cloudiness']!,
+      windSpeed: openWeatherData1['Wind Speed']!,
+    );
+    double airQuality = openWeatherData2['Air Quality']! / 5;
+
     final mainpageData = {
       'Noise Level': noiseLevel,
       'Light Exposure': lightExposure,
       'Physical Activity': physicalActivity,
-      'Air Quality': openWeatherData2['Air Quality']! / 5,
-      'Weather': openWeatherData1['Temperature']!,
+      'Air Quality': airQuality,
+      'Weather': weatherLevel,
     };
 
     // Upload data to Firebase
     try {
+      // Upload sensorData to 'sensor_data' collection
       await FirebaseFirestore.instance.collection('sensor_data').add({
         'timestamp': FieldValue.serverTimestamp(),
         ...sensorData,
       });
-      print(
-        'Data uploaded successfully to Firebase: $sensorData',
-      ); // Success message
+      print('Sensor data uploaded successfully to Firebase: $sensorData');
+
+      // Upload apiData to 'api_data' collection
+      await FirebaseFirestore.instance.collection('api_data').add({
+        'timestamp': FieldValue.serverTimestamp(),
+        ...apiData,
+      });
+      print('API data uploaded successfully to Firebase: $apiData');
     } catch (err) {
       print('Error uploading data to Firebase: $err');
     }
 
-    yield sensorData;
+    yield mainpageData;
+    print(mainpageData);
   }
 
   await controller.close();
+}
+
+double calculateWeatherBadness({
+  required double temperature,
+  required double humidity,
+  required double rain,
+  required double cloudiness,
+  required double windSpeed,
+}) {
+  // 温度糟糕度
+  double tempBad = ((temperature - 20).abs() / 20).clamp(0, 1); // 离20°C越远越糟糕
+
+  // 湿度糟糕度
+  double humidityBad = ((humidity - 50).abs() / 50).clamp(0, 1); // 离50%越远越糟糕
+
+  // 降雨糟糕度
+  double rainBad = (rain / 10).clamp(0, 1); // 10mm以上很糟糕
+
+  // 云量糟糕度
+  double cloudBad = ((cloudiness - 25).abs() / 50).clamp(0, 1); // 25%左右最舒服
+
+  // 风速糟糕度
+  double windBad = (windSpeed / 10).clamp(0, 1); // 10m/s以上很糟糕
+
+  // 权重分配（根据你的需求可以自己调）
+  double badness =
+      (tempBad * 0.3) +
+      (humidityBad * 0.2) +
+      (rainBad * 0.2) +
+      (cloudBad * 0.1) +
+      (windBad * 0.2);
+
+  // 最后输出一个 0~1 的 badness 值
+  return badness.clamp(0, 1);
+}
+
+double calculateStressIndex({
+  required double noiseLevel,
+  required double lightExposure,
+  required double physicalActivity,
+  required double airQuality,
+  required double weatherLevel,
+}) {
+  double noiseStress = noiseLevel.clamp(0, 1);
+
+  double lightStress = (2 * (lightExposure - 0.5).abs()).clamp(0, 1);
+
+  double activityStress;
+  if (physicalActivity <= 0.3) {
+    activityStress = 0.0;
+  } else if (physicalActivity <= 0.7) {
+    activityStress = (physicalActivity - 0.3) / 0.4;
+  } else {
+    activityStress = 1.0;
+  }
+
+  double airStress = airQuality.clamp(0, 1);
+
+  double weatherStress = weatherLevel.clamp(0, 1);
+
+  double stressIndex =
+      (noiseStress * 0.25) +
+      (lightStress * 0.15) +
+      (activityStress * 0.15) +
+      (airStress * 0.25) +
+      (weatherStress * 0.20);
+
+  return stressIndex.clamp(0, 1);
 }
