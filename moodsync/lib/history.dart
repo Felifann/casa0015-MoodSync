@@ -43,21 +43,56 @@ class _HistoryPageState extends State<HistoryPage> {
             lastDay: DateTime.now(),
             focusedDay: _focusedDate, // Use _focusedDate here
             selectedDayPredicate: (day) => isSameDay(day, _selectedDate),
-            onDaySelected: (selectedDay, focusedDay) {
+            onDaySelected: (selectedDay, focusedDay) async {
               setState(() {
                 _selectedDate = selectedDay;
                 _focusedDate = focusedDay; // Update _focusedDate as well
               });
-              // Load assessment for the selected day
-              final assessment = _dailyAssessments[_selectedDate];
-              if (assessment != null) {
-                _selectedMood = assessment['mood'];
-                _selectedStress = assessment['stress'];
-                _descriptionController.text = assessment['description'] ?? '';
-              } else {
-                _selectedMood = null;
-                _selectedStress = null;
-                _descriptionController.clear();
+
+              // Fetch assessment for the selected day from Firebase
+              try {
+                final snapshot =
+                    await FirebaseFirestore.instance
+                        .collection('mood_assessments')
+                        .where(
+                          'date',
+                          isEqualTo:
+                              DateTime(
+                                _selectedDate.year,
+                                _selectedDate.month,
+                                _selectedDate.day,
+                              ).toIso8601String(), // Only store the date part
+                        )
+                        .get();
+
+                if (snapshot.docs.isNotEmpty) {
+                  final data = snapshot.docs.first.data();
+                  setState(() {
+                    _dailyAssessments[_selectedDate] = {
+                      'mood': data['mood'],
+                      'stress': data['stress'],
+                      'description': data['description'] ?? '',
+                    };
+                    _selectedMood = data['mood'];
+                    _selectedStress = data['stress'];
+                    _descriptionController.text = data['description'] ?? '';
+                  });
+                } else {
+                  setState(() {
+                    _dailyAssessments.remove(_selectedDate);
+                    _selectedMood = null;
+                    _selectedStress = null;
+                    _descriptionController.clear();
+                  });
+                }
+              } catch (err) {
+                print('Error fetching mood assessment from Firebase: $err');
+                setState(() {
+                  _dailyAssessments.remove(_selectedDate);
+                  _selectedMood = null;
+                  _selectedStress = null;
+                  _descriptionController.clear();
+                });
               }
             },
             onPageChanged: (focusedDay) {
@@ -345,7 +380,12 @@ class _HistoryPageState extends State<HistoryPage> {
                           .collection('mood_assessments')
                           .add({
                             'timestamp': FieldValue.serverTimestamp(),
-                            'date': _selectedDate.toIso8601String(),
+                            'date':
+                                DateTime(
+                                  _selectedDate.year,
+                                  _selectedDate.month,
+                                  _selectedDate.day,
+                                ).toIso8601String(), // Only store the date part
                             'mood': _selectedMood,
                             'stress': _selectedStress,
                             'description': _descriptionController.text,
