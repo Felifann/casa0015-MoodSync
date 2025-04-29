@@ -15,8 +15,6 @@ Future<void> requestMicrophonePermission() async {
   final status = await Permission.microphone.request();
   if (status.isGranted) {
     print("麦克风权限已授予");
-  } else {
-    print("麦克风权限被拒绝");
   }
 }
 
@@ -236,6 +234,15 @@ Stream<Map<String, double>> getSensorData() async* {
       'Weather': weatherLevel,
     };
 
+    // Calculate stress index
+    final stressIndex = calculateStressIndex(
+      noiseLevel: noiseLevel,
+      lightExposure: lightExposure,
+      physicalActivity: physicalActivity,
+      airQuality: airQuality,
+      weatherLevel: weatherLevel,
+    );
+
     // Upload data to Firebase
     try {
       // Upload sensorData to 'sensor_data' collection
@@ -243,20 +250,31 @@ Stream<Map<String, double>> getSensorData() async* {
         'timestamp': FieldValue.serverTimestamp(),
         ...sensorData,
       });
-      print('Sensor data uploaded successfully to Firebase: $sensorData');
 
       // Upload apiData to 'api_data' collection
       await FirebaseFirestore.instance.collection('api_data').add({
         'timestamp': FieldValue.serverTimestamp(),
         ...apiData,
       });
-      print('API data uploaded successfully to Firebase: $apiData');
+
+      // Upload stressIndex and related data to 'index' collection
+      await FirebaseFirestore.instance.collection('index').add({
+        'timestamp': FieldValue.serverTimestamp(),
+        'Stress Index': stressIndex,
+        'Noise Level': noiseLevel,
+        'Light Exposure': lightExposure,
+        'Physical Activity': physicalActivity,
+        'Air Quality': airQuality,
+        'Weather': weatherLevel,
+      });
     } catch (err) {
       print('Error uploading data to Firebase: $err');
     }
 
-    yield mainpageData;
-    print(mainpageData);
+    yield {
+      ...mainpageData,
+      'Stress Index': stressIndex, // Include stress index in the stream
+    };
   }
 
   await controller.close();

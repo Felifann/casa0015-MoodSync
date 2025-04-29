@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:table_calendar/table_calendar.dart'; // Added import for calendar
 import 'dart:math';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -11,34 +12,10 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
-  final List<double> stressIndex = List.generate(
-    24,
-    (index) => 0.3 + 0.7 * Random().nextDouble(),
-  );
-  final Map<String, List<double>> indexData = {
-    'Noise Level': List.generate(24, (i) => 0.2 + 0.8 * Random().nextDouble()),
-    'Air Quality': List.generate(24, (i) => 0.3 + 0.6 * Random().nextDouble()),
-    'Temperature': List.generate(24, (i) => 0.4 + 0.5 * Random().nextDouble()),
-    'Humidity': List.generate(24, (i) => 0.3 + 0.7 * Random().nextDouble()),
-    'Light Exposure': List.generate(
-      24,
-      (i) => 0.1 + 0.9 * Random().nextDouble(),
-    ),
-    'Locational Density': List.generate(
-      24,
-      (i) => 0.2 + 0.8 * Random().nextDouble(),
-    ),
-  };
-
   DateTime _selectedDate = DateTime.now(); // Selected date state
   DateTime _focusedDate = DateTime.now(); // Add a focused date state
   final bool _isOverallExpanded =
       true; // Default expanded state for Overall Stress Index
-
-  List<double> _getCurrentHourData(List<double> data) {
-    int currentHour = DateTime.now().hour + 1; // Include the current hour
-    return data.sublist(0, currentHour);
-  }
 
   final Map<DateTime, Map<String, dynamic>> _dailyAssessments =
       {}; // Store assessments
@@ -47,6 +24,12 @@ class _HistoryPageState extends State<HistoryPage> {
   String? _selectedMood; // Selected mood emoji
   String? _selectedStress; // Selected stress emoji
   final TextEditingController _descriptionController = TextEditingController();
+
+  final List<double> stressIndex = List.generate(
+    24,
+
+    (i) => 0.3 + Random(i + 7).nextDouble() * 0.2, // Stable random values
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -141,9 +124,13 @@ class _HistoryPageState extends State<HistoryPage> {
             initiallyExpanded: _isOverallExpanded, // Set default expanded state
             children: [
               SizedBox(
-                height: 200,
+                height: 150,
                 child: LineChart(
-                  _buildLineChartData(_getCurrentHourData(stressIndex)),
+                  _buildLineChartData(
+                    stressIndex, // Use all 24 data points
+                    showXAxis: false, // Hide x-axis
+                    showYAxis: false, // Hide y-axis
+                  ),
                 ),
               ),
               SizedBox(height: 16),
@@ -155,7 +142,7 @@ class _HistoryPageState extends State<HistoryPage> {
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
             children:
-                indexData.entries.map((entry) {
+                showDetailsData.entries.map((entry) {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -169,7 +156,11 @@ class _HistoryPageState extends State<HistoryPage> {
                       SizedBox(
                         height: 150,
                         child: LineChart(
-                          _buildLineChartData(_getCurrentHourData(entry.value)),
+                          _buildLineChartData(
+                            entry.value,
+                            showXAxis: false, // Hide x-axis
+                            showYAxis: false, // Hide y-axis
+                          ),
                         ),
                       ),
                       SizedBox(height: 16),
@@ -182,10 +173,65 @@ class _HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  LineChartData _buildLineChartData(List<double> data) {
+  final Map<String, List<double>> showDetailsData = {
+    'Noise Level': List.generate(
+      24,
+      (i) => 0.4 + Random(i + 1).nextDouble() * 0.2,
+    ),
+    'Light Exposure': List.generate(
+      24,
+      (i) => 0.4 + Random(i + 2).nextDouble() * 0.3,
+    ),
+    'Physical Activity': List.generate(
+      24,
+      (i) => 0.05 + Random(i + 3).nextDouble() * 0.4,
+    ),
+    'Air Quality': List.generate(
+      24,
+      (i) => 0.2 + Random(i + 4).nextDouble() * 0.2,
+    ),
+    'Weather': List.generate(24, (i) => 0.3 + Random(i + 5).nextDouble() * 0.2),
+  };
+
+  LineChartData _buildLineChartData(
+    List<double> data, {
+    bool showXAxis = true,
+    bool showYAxis = true,
+  }) {
     return LineChartData(
       gridData: FlGridData(show: true),
-      titlesData: FlTitlesData(show: true),
+      titlesData: FlTitlesData(
+        show: true,
+        leftTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: showYAxis,
+          ), // Control left y-axis visibility
+        ),
+        rightTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            interval: 0.2, // Set intervals for right y-axis
+            reservedSize: 40,
+            getTitlesWidget: (value, meta) {
+              if (value >= 0 && value <= 1) {
+                return Text(
+                  value.toStringAsFixed(1),
+                  style: TextStyle(fontSize: 10),
+                );
+              }
+              return Container();
+            },
+          ),
+        ),
+        topTitles: AxisTitles(
+          sideTitles: SideTitles(showTitles: false), // Remove top axis
+        ),
+        bottomTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: showXAxis,
+          ), // Control x-axis visibility
+        ),
+      ),
       borderData: FlBorderData(show: true),
       lineBarsData: [
         LineChartBarData(
@@ -204,6 +250,8 @@ class _HistoryPageState extends State<HistoryPage> {
           ),
         ),
       ],
+      minY: 0, // Set minimum y-axis value
+      maxY: 1, // Set maximum y-axis value
     );
   }
 
@@ -281,7 +329,7 @@ class _HistoryPageState extends State<HistoryPage> {
               ),
               SizedBox(height: 16),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (_selectedMood != null && _selectedStress != null) {
                     setState(() {
                       _dailyAssessments[_selectedDate] = {
@@ -290,6 +338,24 @@ class _HistoryPageState extends State<HistoryPage> {
                         'description': _descriptionController.text,
                       };
                     });
+
+                    // Upload mood and stress data to Firebase
+                    try {
+                      await FirebaseFirestore.instance
+                          .collection('mood_assessments')
+                          .add({
+                            'timestamp': FieldValue.serverTimestamp(),
+                            'date': _selectedDate.toIso8601String(),
+                            'mood': _selectedMood,
+                            'stress': _selectedStress,
+                            'description': _descriptionController.text,
+                          });
+                    } catch (err) {
+                      print(
+                        'Error uploading mood assessment to Firebase: $err',
+                      );
+                    }
+
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(

@@ -232,11 +232,8 @@ class _MainScreenState extends State<MainScreen> {
                                                 (context) => IndexDetailPage(
                                                   label: 'Weather',
                                                   value:
-                                                      ((preferences['Temperature'] ??
-                                                              0.0) +
-                                                          (preferences['Humidity'] ??
-                                                              0.0)) /
-                                                      2,
+                                                      preferences['Weather'] ??
+                                                      0.0,
                                                 ),
                                           ),
                                         );

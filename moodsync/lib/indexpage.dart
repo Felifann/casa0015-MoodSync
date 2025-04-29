@@ -9,18 +9,6 @@ class IndexDetailPage extends StatelessWidget {
 
   const IndexDetailPage({super.key, required this.label, required this.value});
 
-  List<FlSpot> _generateTrendData(double baseValue) {
-    final now = DateTime.now();
-    return List.generate(4, (index) {
-      final hour = now.subtract(Duration(hours: 3 - index)).hour.toDouble();
-      final value = (baseValue + Random().nextDouble() * 0.1 - 0.05).clamp(
-        0.0,
-        1.0,
-      ); // Add small random fluctuation
-      return FlSpot(hour, value);
-    });
-  }
-
   Future<Map<String, dynamic>> _fetchAirQualityData() async {
     try {
       final querySnapshot =
@@ -36,7 +24,7 @@ class IndexDetailPage extends StatelessWidget {
     } catch (err) {
       print('Error fetching air quality data: $err');
     }
-    return {};
+    return {}; // Return empty map if no data is found
   }
 
   Future<Map<String, dynamic>> _fetchWeatherData() async {
@@ -168,18 +156,48 @@ class IndexDetailPage extends StatelessWidget {
                               gridData: FlGridData(show: true),
                               titlesData: FlTitlesData(
                                 leftTitles: AxisTitles(
-                                  sideTitles: SideTitles(showTitles: true),
+                                  sideTitles: SideTitles(
+                                    showTitles: false, // Remove y-axis labels
+                                  ),
                                 ),
                                 bottomTitles: AxisTitles(
-                                  sideTitles: SideTitles(showTitles: true),
+                                  sideTitles: SideTitles(
+                                    showTitles: true,
+                                    getTitlesWidget: (value, meta) {
+                                      final hour =
+                                          DateTime.now()
+                                              .subtract(
+                                                Duration(
+                                                  hours: 3 - value.toInt(),
+                                                ),
+                                              )
+                                              .hour;
+                                      return Text(
+                                        '$hour:00', // Display hour labels (e.g., "14:00")
+                                        style: TextStyle(fontSize: 12),
+                                      );
+                                    },
+                                    interval:
+                                        1, // Ensure titles align with data points
+                                  ),
                                 ),
                               ),
-                              borderData: FlBorderData(show: true),
+                              borderData: FlBorderData(
+                                show: true,
+                                border: Border.all(
+                                  color: Colors.grey,
+                                  width: 1,
+                                ),
+                              ),
                               lineBarsData: [
                                 LineChartBarData(
-                                  spots: _generateTrendData(
-                                    data['Air Quality'] ?? 0.5,
-                                  ), // Replace with updated method
+                                  spots: List.generate(
+                                    4,
+                                    (index) => FlSpot(
+                                      index.toDouble(),
+                                      Random().nextDouble(),
+                                    ),
+                                  ),
                                   isCurved: true,
                                   color: Colors.blue,
                                   barWidth: 3,
@@ -238,18 +256,48 @@ class IndexDetailPage extends StatelessWidget {
                               gridData: FlGridData(show: true),
                               titlesData: FlTitlesData(
                                 leftTitles: AxisTitles(
-                                  sideTitles: SideTitles(showTitles: true),
+                                  sideTitles: SideTitles(
+                                    showTitles: false, // Remove y-axis labels
+                                  ),
                                 ),
                                 bottomTitles: AxisTitles(
-                                  sideTitles: SideTitles(showTitles: true),
+                                  sideTitles: SideTitles(
+                                    showTitles: true,
+                                    getTitlesWidget: (value, meta) {
+                                      final hour =
+                                          DateTime.now()
+                                              .subtract(
+                                                Duration(
+                                                  hours: 3 - value.toInt(),
+                                                ),
+                                              )
+                                              .hour;
+                                      return Text(
+                                        '$hour:00', // Display hour labels (e.g., "14:00")
+                                        style: TextStyle(fontSize: 12),
+                                      );
+                                    },
+                                    interval:
+                                        1, // Ensure titles align with data points
+                                  ),
                                 ),
                               ),
-                              borderData: FlBorderData(show: true),
+                              borderData: FlBorderData(
+                                show: true,
+                                border: Border.all(
+                                  color: Colors.grey,
+                                  width: 1,
+                                ),
+                              ),
                               lineBarsData: [
                                 LineChartBarData(
-                                  spots: _generateTrendData(
-                                    data['Temperature'] ?? 0.5,
-                                  ), // Replace with updated method
+                                  spots: List.generate(
+                                    4,
+                                    (index) => FlSpot(
+                                      index.toDouble(),
+                                      Random().nextDouble(),
+                                    ),
+                                  ),
                                   isCurved: true,
                                   color: Colors.orange,
                                   barWidth: 3,
@@ -287,14 +335,6 @@ class IndexDetailPage extends StatelessWidget {
                 },
               ),
             ],
-            Text(
-              'Description (Placeholder):',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-            ),
-            Text(
-              'Here we explain what this index measures, how it affects stress, and possible steps to manage it.',
-              style: TextStyle(fontSize: 16),
-            ),
           ],
         ),
       ),
