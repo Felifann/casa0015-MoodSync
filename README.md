@@ -1,23 +1,68 @@
-MoodSync
+# 🚩 MoodSync
 
-This is the Final assessment template for CASA0014 - Please use this template and edit the relevant sections to personalise.
-This section has a short introduction to what the application is
+Welcome to **MoodSync** — a cross-platform Flutter app designed to help users visualize, understand, and manage their **stress and emotional well-being** in real time.
 
-## Use this README File 
+Built for the CASA0015 Final Assessment at UCL, this project reflects a journey of thoughtful design, real-time data integration, and emotion-aware interactivity.
 
-Use this section to show us what your Mobile App is about.   Include a Screenshot to the App, link to the various frameworks you've used. Include your presentation video here that shows off your Mobile App.   Emojis are also fun to include 📱 😄
+---
 
-Look at some other Flutter Apps online and see how they use there README File.  Good examples are:
+## 📱 What is MoodSync?
 
-- https://github.com/miickel/flutter_particle_clock
-- https://github.com/Tarikul711/flutter-food-delivery-app-ui    
-- https://github.com/mohak1283/Instagram-Clone
+**MoodSync** listens to your surroundings — ambient noise, air quality, temperature, light — and transforms them into a dynamic emotional mirror.  
+Whether you're in a busy street or a quiet room, MoodSync helps you see how the **invisible world affects your inner world.**
+
+### 🌟 Features:
+- 🌡️ Real-time environmental monitoring (noise, air, light, humidity, ...)
+- 😄 Dynamic emoji avatar that reflects your current stress index
+- 📊 Visual trend analysis with charts and calendars
+- ⚙️ Customizable preferences for visible indicators
+- 🔄 Cloud synchronization via Firebase
+
+[MoodSync Screenshot]
+<p align="center">
+  <img src="material/IMG_1885.PNG" alt="Home" width="30%" />
+  <img src="material/IMG_1894.PNG" alt="History" width="30%" />
+  <img src="material/IMG_1896.PNG" alt="Preferences" width="30%" />
+</p>
+
+🎥 **[Demo Video – Watch on GitHub](User demo.mp4)**  
 
 
-## Include A Section That Tells Developers How To Install The App
+---
 
-Include a section that gives intructions on how to install the app or run it in Flutter.  What versions of the plugins are you assuming?  Maybe define a licence
+## ⚙️ How to Install and Run
 
-##  Contact Details
+Make sure you have the latest Flutter SDK installed:
 
-Having Contact Details is also good as it shows people how to get in contact with you if they'd like to contribute to the app. 
+```bash
+flutter doctor
+
+Then:
+
+git clone https://github.com/Felifann/casa0015-MoodSync.git
+cd moodsync
+flutter pub get
+flutter run
+```
+
+## 📦 Dependencies Used:
+firebase_core & cloud_firestore
+
+geolocator, permission_handler
+
+fl_chart, table_calendar
+
+flutter_sensors
+
+This app was developed using Flutter 3.x and is tested on Android 13 & iOS 16 simulators.
+
+## 💡 Landing Page
+
+You can also explore the project’s landing page here:
+👉 casa0015-MoodSync/LandingPage
+
+
+This project was created by Fan Xueyin
+
+If you'd like to collaborate or contribute to MoodSync, feel free to reach out or fork the repo! 🤝
+
