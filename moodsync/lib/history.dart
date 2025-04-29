@@ -34,174 +34,222 @@ class _HistoryPageState extends State<HistoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Stress History')),
-      body: ListView(
-        padding: EdgeInsets.all(16),
+      body: Stack(
         children: [
-          TableCalendar(
-            firstDay: DateTime(2023, 1, 1),
-            lastDay: DateTime.now(),
-            focusedDay: _focusedDate, // Use _focusedDate here
-            selectedDayPredicate: (day) => isSameDay(day, _selectedDate),
-            onDaySelected: (selectedDay, focusedDay) async {
-              setState(() {
-                _selectedDate = selectedDay;
-                _focusedDate = focusedDay; // Update _focusedDate as well
-              });
-
-              // Fetch assessment for the selected day from Firebase
-              try {
-                final snapshot =
-                    await FirebaseFirestore.instance
-                        .collection('mood_assessments')
-                        .where(
-                          'date',
-                          isEqualTo:
-                              DateTime(
-                                _selectedDate.year,
-                                _selectedDate.month,
-                                _selectedDate.day,
-                              ).toIso8601String(), // Only store the date part
-                        )
-                        .get();
-
-                if (snapshot.docs.isNotEmpty) {
-                  final data = snapshot.docs.first.data();
-                  setState(() {
-                    _dailyAssessments[_selectedDate] = {
-                      'mood': data['mood'],
-                      'stress': data['stress'],
-                      'description': data['description'] ?? '',
-                    };
-                    _selectedMood = data['mood'];
-                    _selectedStress = data['stress'];
-                    _descriptionController.text = data['description'] ?? '';
-                  });
-                } else {
-                  setState(() {
-                    _dailyAssessments.remove(_selectedDate);
-                    _selectedMood = null;
-                    _selectedStress = null;
-                    _descriptionController.clear();
-                  });
-                }
-              } catch (err) {
-                print('Error fetching mood assessment from Firebase: $err');
-                setState(() {
-                  _dailyAssessments.remove(_selectedDate);
-                  _selectedMood = null;
-                  _selectedStress = null;
-                  _descriptionController.clear();
-                });
-              }
-            },
-            onPageChanged: (focusedDay) {
-              setState(() {
-                _focusedDate =
-                    focusedDay; // Update _focusedDate when the page changes
-              });
-            },
-            calendarFormat: CalendarFormat.week, // Show only the current week
-            calendarStyle: CalendarStyle(
-              todayDecoration: BoxDecoration(
-                color: Colors.deepPurple,
-                shape: BoxShape.circle,
-              ),
-              selectedDecoration: BoxDecoration(
-                color: Colors.deepPurpleAccent,
-                shape: BoxShape.circle,
-              ),
+          // Background image with reduced opacity
+          Opacity(
+            opacity: 0.2, // Adjust transparency
+            child: Image.asset(
+              'assets/background.jpg', // Replace with your image path
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: double.infinity,
             ),
           ),
-          SizedBox(height: 16),
-          if (!_dailyAssessments.containsKey(_selectedDate)) ...[
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () => _showAssessmentModal(isEdit: false),
-                child: Text('Edit', style: TextStyle(color: Colors.deepPurple)),
-              ),
-            ),
-          ],
-          if (_dailyAssessments.containsKey(_selectedDate)) ...[
-            SizedBox(height: 16),
-            Text(
-              'Assessment for ${_selectedDate.toLocal().toString().split(' ')[0]}',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            Text('Mood: ${_dailyAssessments[_selectedDate]!['mood']}'),
-            Text('Stress: ${_dailyAssessments[_selectedDate]!['stress']}'),
-            if (_dailyAssessments[_selectedDate]!['description'] != null &&
-                _dailyAssessments[_selectedDate]!['description']!.isNotEmpty)
-              Text(
-                'Description: ${_dailyAssessments[_selectedDate]!['description']}',
-              ),
-            SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () => _showAssessmentModal(isEdit: true),
-                child: Text('Edit', style: TextStyle(color: Colors.deepPurple)),
-              ),
-            ),
-          ],
-          SizedBox(height: 16),
-          Text(
-            '24h Stress History',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 24),
-          ExpansionTile(
-            title: Text(
-              'Overall Stress Index',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            ),
-            initiallyExpanded: _isOverallExpanded, // Set default expanded state
+          // Main content
+          ListView(
+            padding: EdgeInsets.all(16),
             children: [
-              SizedBox(
-                height: 150,
-                child: LineChart(
-                  _buildLineChartData(
-                    stressIndex, // Use all 24 data points
-                    showXAxis: false, // Hide x-axis
-                    showYAxis: false, // Hide y-axis
+              Text(
+                'Mood Diary 📖',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black, // Set transparency
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 16),
+              TableCalendar(
+                firstDay: DateTime(2023, 1, 1),
+                lastDay: DateTime.now(),
+                focusedDay: _focusedDate, // Use _focusedDate here
+                selectedDayPredicate: (day) => isSameDay(day, _selectedDate),
+                onDaySelected: (selectedDay, focusedDay) async {
+                  setState(() {
+                    _selectedDate = selectedDay;
+                    _focusedDate = focusedDay; // Update _focusedDate as well
+                  });
+
+                  // Fetch assessment for the selected day from Firebase
+                  try {
+                    final snapshot =
+                        await FirebaseFirestore.instance
+                            .collection('mood_assessments')
+                            .where(
+                              'date',
+                              isEqualTo:
+                                  DateTime(
+                                    _selectedDate.year,
+                                    _selectedDate.month,
+                                    _selectedDate.day,
+                                  ).toIso8601String(), // Only store the date part
+                            )
+                            .get();
+
+                    if (snapshot.docs.isNotEmpty) {
+                      final data = snapshot.docs.first.data();
+                      setState(() {
+                        _dailyAssessments[_selectedDate] = {
+                          'mood': data['mood'],
+                          'stress': data['stress'],
+                          'description': data['description'] ?? '',
+                        };
+                        _selectedMood = data['mood'];
+                        _selectedStress = data['stress'];
+                        _descriptionController.text = data['description'] ?? '';
+                      });
+                    } else {
+                      setState(() {
+                        _dailyAssessments.remove(_selectedDate);
+                        _selectedMood = null;
+                        _selectedStress = null;
+                        _descriptionController.clear();
+                      });
+                    }
+                  } catch (err) {
+                    print('Error fetching mood assessment from Firebase: $err');
+                    setState(() {
+                      _dailyAssessments.remove(_selectedDate);
+                      _selectedMood = null;
+                      _selectedStress = null;
+                      _descriptionController.clear();
+                    });
+                  }
+                },
+                onPageChanged: (focusedDay) {
+                  setState(() {
+                    _focusedDate =
+                        focusedDay; // Update _focusedDate when the page changes
+                  });
+                },
+                calendarFormat:
+                    CalendarFormat.week, // Show only the current week
+                calendarStyle: CalendarStyle(
+                  todayDecoration: BoxDecoration(
+                    color: Colors.deepPurple,
+                    shape: BoxShape.circle,
+                  ),
+                  selectedDecoration: BoxDecoration(
+                    color: Colors.deepPurpleAccent,
+                    shape: BoxShape.circle,
                   ),
                 ),
               ),
               SizedBox(height: 16),
-            ],
-          ),
-          ExpansionTile(
-            title: Text(
-              'Show Details',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            ),
-            children:
-                showDetailsData.entries.map((entry) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        entry.key,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
+              if (!_dailyAssessments.containsKey(_selectedDate)) ...[
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () => _showAssessmentModal(isEdit: false),
+                    child: Text(
+                      'Edit',
+                      style: TextStyle(color: Colors.deepPurple),
+                    ),
+                  ),
+                ),
+              ],
+              if (_dailyAssessments.containsKey(_selectedDate)) ...[
+                SizedBox(height: 16),
+                Text(
+                  'Assessment for ${_selectedDate.toLocal().toString().split(' ')[0]} 📅',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ), // Increased font size
+                ),
+                Text(
+                  'Mood: ${_dailyAssessments[_selectedDate]!['mood']} 😄',
+                  style: TextStyle(fontSize: 16), // Increased font size
+                ),
+                Text(
+                  'Stress: ${_dailyAssessments[_selectedDate]!['stress']} 😟',
+                  style: TextStyle(fontSize: 16), // Increased font size
+                ),
+                if (_dailyAssessments[_selectedDate]!['description'] != null &&
+                    _dailyAssessments[_selectedDate]!['description']!
+                        .isNotEmpty)
+                  Text(
+                    'Description: ${_dailyAssessments[_selectedDate]!['description']}',
+                  ),
+                SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () => _showAssessmentModal(isEdit: true),
+                    child: Text(
+                      'Edit',
+                      style: TextStyle(color: Colors.deepPurple),
+                    ),
+                  ),
+                ),
+              ],
+              SizedBox(height: 16),
+              Text(
+                '24h Stress History 📈',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ), // Increased font size
+              ),
+              SizedBox(height: 24),
+              ExpansionTile(
+                title: Text(
+                  'Overall Stress Index 📊',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ), // Increased font size
+                ),
+                initiallyExpanded:
+                    _isOverallExpanded, // Set default expanded state
+                children: [
+                  SizedBox(
+                    height: 150,
+                    child: LineChart(
+                      _buildLineChartData(
+                        stressIndex, // Use all 24 data points
+                        showXAxis: false, // Hide x-axis
+                        showYAxis: false, // Hide y-axis
                       ),
-                      SizedBox(
-                        height: 150,
-                        child: LineChart(
-                          _buildLineChartData(
-                            entry.value,
-                            showXAxis: false, // Hide x-axis
-                            showYAxis: false, // Hide y-axis
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                ],
+              ),
+              ExpansionTile(
+                title: Text(
+                  'Show Details',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+                children:
+                    showDetailsData.entries.map((entry) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            entry.key,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                    ],
-                  );
-                }).toList(),
+                          SizedBox(
+                            height: 150,
+                            child: LineChart(
+                              _buildLineChartData(
+                                entry.value,
+                                showXAxis: false, // Hide x-axis
+                                showYAxis: false, // Hide y-axis
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 16),
+                        ],
+                      );
+                    }).toList(),
+              ),
+            ],
           ),
         ],
       ),
@@ -304,7 +352,13 @@ class _HistoryPageState extends State<HistoryPage> {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 16),
-              Text('How do you feel?'),
+              Text(
+                'How do you feel? 😊',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ), // Increased font size
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children:
@@ -329,7 +383,13 @@ class _HistoryPageState extends State<HistoryPage> {
                     }).toList(),
               ),
               SizedBox(height: 16),
-              Text('How stressed are you?'),
+              Text(
+                'How stressed are you? 😟',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ), // Increased font size
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children:
